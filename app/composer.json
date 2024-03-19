@@ -1,0 +1,15 @@
+{
+    "name": "mdinle/web_development_1",
+    "description": "Web Development 1 project",
+    "autoload": {
+        "psr-4": {
+            "Mdinle\\WebDevelopment1\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mohamed Dinle"
+        }
+    ],
+    "require": {}
+}
