@@ -3,7 +3,15 @@
     "description": "Web Development 1 project",
     "autoload": {
         "psr-4": {
-            "Mdinle\\WebDevelopment1\\": "src/"
+            "App\\": ".",
+            "App\\Controllers\\": "./controllers",
+            "App\\Models\\": "./models",
+            "App\\Services\\": "./services",
+            "App\\Repositories\\": "./repositories",
+            "App\\Views\\": "./views",
+            "App\\Api\\": "./api",
+            "App\\Api\\Controllers\\": "./api/controllers",
+            "App\\Exceptions\\": "./exceptions"
         }
     },
     "authors": [

@@ -6,5 +6,13 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Mdinle\\WebDevelopment1\\' => array($baseDir . '/src'),
+    'App\\Views\\' => array($baseDir . '/views'),
+    'App\\Services\\' => array($baseDir . '/services'),
+    'App\\Repositories\\' => array($baseDir . '/repositories'),
+    'App\\Models\\' => array($baseDir . '/models'),
+    'App\\Exceptions\\' => array($baseDir . '/exceptions'),
+    'App\\Controllers\\' => array($baseDir . '/controllers'),
+    'App\\Api\\Controllers\\' => array($baseDir . '/api/controllers'),
+    'App\\Api\\' => array($baseDir . '/api'),
+    'App\\' => array($baseDir . '/'),
 );

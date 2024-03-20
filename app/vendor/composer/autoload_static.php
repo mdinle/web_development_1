@@ -7,16 +7,56 @@ namespace Composer\Autoload;
 class ComposerStaticInitfb4bc325b63331847c37bc7fa0949129
 {
     public static $prefixLengthsPsr4 = array (
-        'M' => 
+        'A' => 
         array (
-            'Mdinle\\WebDevelopment1\\' => 23,
+            'App\\Views\\' => 10,
+            'App\\Services\\' => 13,
+            'App\\Repositories\\' => 17,
+            'App\\Models\\' => 11,
+            'App\\Exceptions\\' => 15,
+            'App\\Controllers\\' => 16,
+            'App\\Api\\Controllers\\' => 20,
+            'App\\Api\\' => 8,
+            'App\\' => 4,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Mdinle\\WebDevelopment1\\' => 
+        'App\\Views\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/src',
+            0 => __DIR__ . '/../..' . '/views',
+        ),
+        'App\\Services\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/services',
+        ),
+        'App\\Repositories\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/repositories',
+        ),
+        'App\\Models\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/models',
+        ),
+        'App\\Exceptions\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/exceptions',
+        ),
+        'App\\Controllers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/controllers',
+        ),
+        'App\\Api\\Controllers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/api/controllers',
+        ),
+        'App\\Api\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/api',
+        ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/',
         ),
     );
 
