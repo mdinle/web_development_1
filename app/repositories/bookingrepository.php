@@ -3,6 +3,7 @@ namespace App\Repositories;
 
 use PDO;
 use App\Models\Appointment;
+use Exception;
 
 class BookingRepository extends Repository
 {
@@ -39,7 +40,23 @@ class BookingRepository extends Repository
             ':notes' => $booking->getNotes()
         ]);
 
+        if (!$results) {
+            throw new Exception("Failed to insert booking into database.");
+        }
+    
         return $results;
+    }
+
+    public function delete($appointmentID)
+    {
+        $stmt = $this->db->prepare("DELETE FROM Appointments WHERE AppointmentID = :appointmentID");
+        $results = $stmt->execute([':appointmentID' => $appointmentID]);
+
+        if (!$results) {
+            throw new Exception("Failed to delete booking.");
+        } else {
+            return $results;
+        }
     }
 
     public function getBookingsByClient($client_id)
@@ -68,5 +85,50 @@ class BookingRepository extends Repository
         }
 
         return $bookings;
+    }
+
+    public function checkAvailibilty($booking)
+    {
+        $start_time = $booking->getDate();
+        $duration_minutes = $booking->getDuration();
+        $end_time = date('Y-m-d H:i:s', strtotime("$start_time + $duration_minutes minutes"));
+        ;
+
+        $stmt = $this->db->prepare("SELECT *
+        FROM Appointments
+        WHERE
+            TrainerID = 1
+            AND (
+                AppointmentDateTime < :end_time
+                AND DATE_ADD(AppointmentDateTime, INTERVAL Duration HOUR_MINUTE) > :start_time
+            );");
+
+        $stmt->execute([
+            ':start_time' => $start_time,
+            ':end_time' => $end_time]);
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        
+        if ($results) {
+            throw new Exception("Trainer is not available at this time.");
+        } else {
+            return $this->insert($booking);
+        }
+             
+    }
+
+    public function canCancelAppointment($appointmentID)
+    {
+        $stmt = $this->db->prepare("SELECT Status FROM Appointments WHERE AppointmentID = :appointmentID");
+        $stmt->execute([':appointmentID' => $appointmentID]);
+
+        $status = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($status['Status'] === 'pending') {
+            return $this->delete($appointmentID);
+        } else {
+            throw new Exception("Cannot cancel appointment. Trainer has already accepted session.");
+        }
     }
 }

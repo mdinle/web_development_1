@@ -18,6 +18,11 @@ class BookingService
         return $this->bookingRepo->insert($booking);
     }
 
+    public function checkAvailibilty($booking)
+    {
+        return $this->bookingRepo->checkAvailibilty($booking);
+    }
+
     public function getAllTrainers()
     {
         return $this->bookingRepo->getAllTrainers();
@@ -38,8 +43,8 @@ class BookingService
         return $this->bookingRepo->updateBooking($booking);
     }
 
-    public function deleteBooking($booking_id)
+    public function deleteBooking($appointmentId)
     {
-        return $this->bookingRepo->deleteBooking($booking_id);
+        return $this->bookingRepo->canCancelAppointment($appointmentId);
     }
 }

@@ -26,6 +26,9 @@
 								Duration
 							</th>
 							<th scope="col" class="px-6 py-3">
+								Status
+							</th>
+							<th scope="col" class="px-6 py-3">
 								Trainer
 							</th>
 							<th scope="col" class="px-6 py-3">
@@ -41,6 +44,7 @@
 						    echo '<th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">' . $date . '</th>';
 						    echo '<td class="px-6 py-4">' . $time . '</td>';
 						    echo '<td class="px-6 py-4">' . $appointment->getDuration() . '</td>';
+						    echo '<td class="px-6 py-4">' . $appointment->getStatus() . '</td>';
 						    echo '<td class="px-6 py-4">' . $appointment->getTrainerName() . '</td>';
 						    echo '<td class="px-6 py-4"><button class="text-red-500 underline underline-offset-1" onclick="deleteUser(' . $appointment->getAppointmentID() . ')">Delete</button></td>';
 						    echo '</tr>';
@@ -56,7 +60,32 @@
 <script>
 	function deleteUser(id) {
 		if (confirm('Are you sure you want to delete this appointment?')) {
-			console.log('Appointment deleted');
+
+			fetch('/api/booking/delete', {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(id),
+				})
+				.then(response => {
+					if (!response.ok) {
+						// If the response is not OK, handle the error
+						return response.json().then(error => {
+							throw new Error(error
+								.message); // Throw an error with the message received from the server
+						});
+					}
+					return response.json(); // If response is OK, return JSON data
+				})
+				.then(data => {
+					alert(data.message);
+					location.reload();
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+					alert('Error booking session: ' + error.message); // Display the error message in the alert box
+				});
 		}
 	}
 </script>

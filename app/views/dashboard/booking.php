@@ -135,22 +135,22 @@
 
 		var currentDate = new Date();
 
-		console.log(selectDate, currentDate);
-
 		if (selectDate < currentDate) {
 			alert('Selected date is a past date');
 			return;
 		};
 
+		var utcDate = new Date(selectDate.getTime() - (selectDate.getTimezoneOffset() * 60000));
+		var isoDateString = utcDate.toISOString();
+
+
 		var session = {
 			"trainerId": trainer,
 			"clientId": userId,
-			"date": selectDate,
+			"date": isoDateString,
 			"duration": duration,
 			"notes": notes
 		};
-
-		console.log(session);
 
 		fetch('/api/booking/create', {
 				method: 'POST',
@@ -159,14 +159,23 @@
 				},
 				body: JSON.stringify(session),
 			})
-			.then(response => response.json())
+			.then(response => {
+				if (!response.ok) {
+					// If the response is not OK, handle the error
+					return response.json().then(error => {
+						throw new Error(error
+							.message); // Throw an error with the message received from the server
+					});
+				}
+				return response.json(); // If response is OK, return JSON data
+			})
 			.then(data => {
-				console.log('Success:', data);
-				alert('Session booked successfully');
+				alert(data.message);
+				window.location.href = '/dashboard';
 			})
 			.catch((error) => {
 				console.error('Error:', error);
-				alert('Error booking session');
+				alert('Error booking session: ' + error.message); // Display the error message in the alert box
 			});
 	}
 </script>

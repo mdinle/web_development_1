@@ -31,14 +31,48 @@ class BookingController
             $appointment->setStatus('pending');
             $appointment->setNotes($data['notes']);
 
-            $result = $this->bookingService->createBooking($appointment);
-            if ($result) {
-                echo json_encode(['message' => 'Booking was made succesfully']);
-            } else {
+            try {
+                if($this->bookingService->checkAvailibilty($appointment)) {
+                    http_response_code(200);
+                    echo json_encode(['message' => 'Booking created']);
+                }
+            } catch(Exception $e) {
                 http_response_code(500);
-                echo json_encode(['message' => 'Failed to make booking']);
+                echo json_encode(['message' => $e->getMessage()]);
+                return;
+            }
+            
+        }
+    }
+
+    public function delete()
+    {
+        if (!isset($_SESSION['user'])) {
+            http_response_code(401);
+            echo json_encode(['message' => 'Unauthorized']);
+            return;
+        }
+
+        if ($_SERVER["REQUEST_METHOD"] == "DELETE") {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            if(!isset($data)) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Missing appointmentId']);
+                return;
+            }
+
+            try {
+                if($this->bookingService->deleteBooking($data)) {
+                    http_response_code(200);
+                    echo json_encode(['message' => 'Booking deleted']);
+                }
+            } catch(Exception $e) {
+                http_response_code(500);
+                echo json_encode(['message' => $e->getMessage()]);
+                return;
             }
         }
-        
     }
 }
