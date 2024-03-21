@@ -10,7 +10,7 @@ class User
     private $userType;
     private $registrationDate;
     private $lastLoginDate;
-
+    
     public function getUserID()
     {
         return $this->userID;

@@ -152,6 +152,22 @@
         display: none;
     }
 
+    .modal-container {
+        position: relative;
+    }
+
+    .modal-content {
+        border-radius: 0.5rem;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        font-size: 1.5rem;
+        color: #333;
+    }
+
     @media only screen and (min-width: 768px) {
         .header-right {
             width: calc(100% - 16rem);

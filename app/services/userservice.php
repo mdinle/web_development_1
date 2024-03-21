@@ -22,7 +22,7 @@ class UserService
         $userData = $this->userRepo->getUserByEmail($user->getEmail());
 
         if ($userData) {
-            if (!password_verify($user->getPassword(), $userData->getPassword())) {
+            if (!password_verify($user->getPassword(), $userData['user']->getPassword())) {
                 return false;
             }
             return $userData;
@@ -34,5 +34,20 @@ class UserService
     public function changePassword($password, $user_id)
     {
         return $this->userRepo->changePassword($password, $user_id);
+    }
+
+    public function getAllUsers()
+    {
+        return $this->userRepo->getAllUsers();
+    }
+
+    public function updateUser($user)
+    {
+        return $this->userRepo->updateUser($user);
+    }
+
+    public function deleteUser($user_id)
+    {
+        return $this->userRepo->deleteUser($user_id);
     }
 }

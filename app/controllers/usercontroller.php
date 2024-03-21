@@ -52,9 +52,14 @@ class UserController
             $authenticateUser = $this->UserService->authenticateUser($user);
 
             if($authenticateUser) {
-                $_SESSION['user'] = $authenticateUser;
+                $_SESSION['user'] = $authenticateUser['user'];
+                $_SESSION['userDetails'] = $authenticateUser['details'];
                     
-                header('Location: /dashboard');
+                if($_SESSION['userDetails']->getId()) {
+                    header('Location: /dashboard');
+                } else {
+                    header('Location: /dashboard/profile');
+                }
             } else {
                 $errorMessage = "Invalid email or password";
                 include '../views/user/login.php';
