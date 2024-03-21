@@ -2,12 +2,13 @@
 namespace App\Repositories;
 
 use PDO;
+use App\Models\Appointment;
 
 class BookingRepository extends Repository
 {
     public function getAllTrainers()
     {
-        $stmt = $this->db->prepare("SELECT UserId, Username FROM Users WHERE UserType = 'trainer'");
+        $stmt = $this->db->prepare("SELECT TrainerId, FullName FROM TrainerDetails");
         $stmt->execute();
 
         $trainerData = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -16,8 +17,8 @@ class BookingRepository extends Repository
 
         foreach ($trainerData as $data) {
             $trainers[] = [
-                'UserId' => $data['UserId'],
-                'Username' => $data['Username']
+                'trainerId' => $data['TrainerId'],
+                'fullName' => $data['FullName']
             ];
         }
 
@@ -39,5 +40,33 @@ class BookingRepository extends Repository
         ]);
 
         return $results;
+    }
+
+    public function getBookingsByClient($client_id)
+    {
+        $stmt = $this->db->prepare("SELECT AppointmentID, ClientID, Appointments.TrainerID, TrainerDetails.FullName AS Trainer, AppointmentDateTime, Duration, Status
+        FROM `Appointments` 
+        JOIN TrainerDetails ON Appointments.TrainerID = TrainerDetails.TrainerID
+        where ClientID = :clientId;");
+        $stmt->execute([':clientId' => $client_id]);
+
+        $bookingData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $bookings = [];
+
+        foreach ($bookingData as $data) {
+            $booking = new Appointment();
+            $booking->setAppointmentID($data['AppointmentID']);
+            $booking->setClientID($data['ClientID']);
+            $booking->setTrainerID($data['TrainerID']);
+            $booking->setTrainerName($data['Trainer']);
+            $booking->setDate($data['AppointmentDateTime']);
+            $booking->setDuration($data['Duration']);
+            $booking->setStatus($data['Status']);
+
+            $bookings[] = $booking;
+        }
+
+        return $bookings;
     }
 }

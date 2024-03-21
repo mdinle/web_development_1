@@ -21,6 +21,36 @@ class UserRepository extends Repository
 
     }
 
+    public function insertUserDetails($userDetails, $userType)
+    {
+        $query = '';
+        if($userType === 'client') {
+            $query = "INSERT INTO ClientDetails (UserID, FullName, Age, Gender, Address, PhoneNumber) 
+            VALUES (:userID, :fullname, :age, :gender, :address, :phonenumber)";
+        } elseif ($userType === 'trainer') {
+            $query = "INSERT INTO TrainerDetails (UserID, FullName, Age, Gender, Address, PhoneNumber) 
+            VALUES (:userID, :fullname, :age, :gender, :address, :phonenumber)";
+        }
+
+        $stmt = $this->db->prepare($query);
+
+        $results = $stmt->execute([
+            ':userID' => $userDetails->getId(),
+            ':fullname' => $userDetails->getFullName(),
+            ':age' => $userDetails->getAge(),
+            ':gender' => $userDetails->getGender(),
+            ':address' => $userDetails->getAddress(),
+            ':phonenumber' => $userDetails->getPhonenumber()]);
+
+        if($results) {
+            $newUserID = $this->db->lastInsertId();
+
+            return $newUserID;
+        } else {
+            return false;
+        }
+    }
+
 
     public function getUserByEmail($email)
     {
@@ -108,7 +138,6 @@ class UserRepository extends Repository
         } else {
             return false;
         }
-
     }
 
     public function changePassword($password, $user_id)

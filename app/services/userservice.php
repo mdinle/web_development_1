@@ -17,6 +17,11 @@ class UserService
         return $this->userRepo->insert($user);
     }
 
+    public function createUserDetails($userDetails, $userType)
+    {
+        return $this->userRepo->insertUserDetails($userDetails, $userType);
+    }
+
     public function authenticateUser($user)
     {
         $userData = $this->userRepo->getUserByEmail($user->getEmail());

@@ -8,10 +8,21 @@ class Appointment
     private $appointmentID;
     private $clientID;
     private $trainerID;
+    private $trainerName;
     private $date;
     private $duration;
     private $status;
     private $notes;
+
+    public function getTrainerName()
+    {
+        return $this->trainerName;
+    }
+
+    public function setTrainerName($trainerName)
+    {
+        $this->trainerName = $trainerName;
+    }
 
     public function getAppointmentID()
     {

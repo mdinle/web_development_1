@@ -3,11 +3,13 @@
 use App\Services\UserService;
 use App\Services\BookingService;
 use App\Models\User;
+use App\Models\Details;
 
 class DashboardController
 {
     private $userService;
     private $bookingService;
+    private $missingProfileInfo;
 
 
     public function __construct()
@@ -18,39 +20,38 @@ class DashboardController
 
     public function index()
     {
-        if(!isset($_SESSION['user'])) {
-            header('Location: /user/login');
-            exit();
-        }
+        if($_SERVER['REQUEST_METHOD'] == "GET") {
+            if(!isset($_SESSION['user'])) {
+                header('Location: /user/login');
+                exit();
+            }
 
-        if(!$_SESSION['userDetails']->getId()) {
-            header('Location: /dashboard/profile');
-            exit();
-        }
+            $this->checkIfUserInfoIsMissing();
 
-        $userName = $_SESSION['user']->getUsername();
-        $userType = $_SESSION['user']->getUserType();
-        include '../views/dashboard/index.php';
+            $appointments = $this->bookingService->getBookingsByClient($_SESSION['userDetails']->getId());
+            $userName = $_SESSION['user']->getUsername();
+            $userType = $_SESSION['user']->getUserType();
+            include '../views/dashboard/index.php';
+        }
     }
 
     public function booking()
     {
-        if(!isset($_SESSION['user'])) {
-            header('Location: /user/login');
-            exit();
+
+        if($_SERVER['REQUEST_METHOD'] == "GET") {
+            if(!isset($_SESSION['user'])) {
+                header('Location: /user/login');
+                exit();
+            }
+
+            $this->checkIfUserInfoIsMissing();
+
+            $trainers = $this->bookingService->getAllTrainers();
+            $clientId = $_SESSION['userDetails']->getId();
+            $userName = $_SESSION['user']->getUsername();
+            $userType = $_SESSION['user']->getUserType();
+            include '../views/dashboard/booking.php';
         }
-
-        if(!$_SESSION['userDetails']->getId()) {
-            header('Location: /dashboard/profile');
-            exit();
-        }
-
-
-        $trainers = $this->bookingService->getAllTrainers();
-        $userId = $_SESSION['user']->getUserID();
-        $userName = $_SESSION['user']->getUsername();
-        $userType = $_SESSION['user']->getUserType();
-        include '../views/dashboard/booking.php';
     }
 
     public function admin()
@@ -118,6 +119,8 @@ class DashboardController
                 exit();
             }
 
+            $this->checkIfUserInfoIsMissing();
+            
             $users = $this->userService->getAllUsers();
             $userName = $_SESSION['user']->getUsername();
             $userType = $_SESSION['user']->getUserType();
@@ -130,6 +133,27 @@ class DashboardController
     {
         if($_SERVER['REQUEST_METHOD'] == "POST") {
 
+            $userDetails = new Details();
+
+            $userDetails->setId($_SESSION['user']->getUserID());
+            $userDetails->setFullName($_POST['fullname']);
+            $userDetails->setAge($_POST['age']);
+            $userDetails->setGender($_POST['gender']);
+            $userDetails->setAddress($_POST['address']);
+            $userDetails->setPhonenumber($_POST['phonenumber']);
+
+            if($_SESSION['user']->getUserType() !== null) {
+                $result = $this->userService->createUserDetails($userDetails, $_SESSION['user']->getUserType());
+
+                if($result) {
+                    $userDetails->setId($result);
+
+                    $_SESSION['userDetails'] = $userDetails;
+
+                    header('Location: /dashboard');
+                } else {
+                }
+            }
         }
 
         if($_SERVER['REQUEST_METHOD'] == "GET") {
@@ -146,7 +170,16 @@ class DashboardController
 
             $userName = $_SESSION['user']->getUsername();
             $userType = $_SESSION['user']->getUserType();
+            $userId = $_SESSION['user']->getUserID();
             include '../views/dashboard/profile.php';
+        }
+    }
+
+    private function checkIfUserInfoIsMissing()
+    {
+        if(!$_SESSION['userDetails']->getId()) {
+            header('Location: /dashboard/profile');
+            exit();
         }
     }
 }

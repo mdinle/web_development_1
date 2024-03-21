@@ -39,7 +39,7 @@
 						class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
 						<option selected>Choose a trainer</option>
 						<?php foreach ($trainers as $trainer) {
-						    echo '<option value="' . $trainer['UserId'] . '">' . $trainer['Username'] . '</option>';
+						    echo '<option value="' . $trainer['trainerId'] . '">' . $trainer['fullName'] . '</option>';
 						}?>
 					</select>
 
@@ -97,12 +97,13 @@
 	}
 
 	function bookSession() {
-		const userId = <?php echo $userId?> ;
+		const userId = <?php echo $clientId?> ;
 		var dateInput = document.getElementById('selectDate').value;
 		var trainer = document.getElementById('selectTrainer').value;
 		var timeInput = document.getElementById('selectTime').value;
 		var duration = document.getElementById('selectDuration').value;
 		var notes = document.getElementById('notes').value;
+
 
 		if (dateInput === '' || trainer === 'Choose a trainer' || time === 'Choose a time' || duration ===
 			'Choose a duration') {
@@ -119,6 +120,16 @@
 		var hours = parseInt(timeParts[0], 10);
 		var minutes = parseInt(timeParts[1], 10);
 
+		if (timeInput.includes('PM') && hours < 12) {
+			hours += 12;
+		} else if (timeInput.includes('AM') && hours === 12) {
+			hours = 0;
+		}
+
+		hours = hours < 10 ? '0' + hours : hours;
+		minutes = minutes < 10 ? '0' + minutes : minutes;
+
+		var formattedTime = hours + ':' + minutes + ':00';
 
 		var selectDate = new Date(year, month, day, hours, minutes);
 
