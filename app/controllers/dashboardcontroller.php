@@ -133,7 +133,15 @@ class DashboardController
     {
         if($_SERVER['REQUEST_METHOD'] == "POST") {
 
-            $userDetails = new Details();
+            if(isset($_POST['user'], $_POST['fullname'], $_POST['age'], $_POST['gender'], $_POST['address'], $_POST['phonenumber'])){
+                $useriD = filter_var($_POST['user'], FILTER_SANITIZE_NUMBER_INT);
+                $fullName = htmlspecialchars($_POST['fullname']);
+                $age = filter_var($_POST['age'], FILTER_SANITIZE_NUMBER_INT);
+                $gender = htmlspecialchars($POST_['gender']);
+                $address = htmlspecialchars($_POST['address']);
+                $phoneNumber = filter_var($_POST['phonenumber'], FILTER_SANITIZE_NUMBER_INT);
+
+                $userDetails = new Details();
 
             $userDetails->setId($_SESSION['user']->getUserID());
             $userDetails->setFullName($_POST['fullname']);
@@ -152,7 +160,13 @@ class DashboardController
 
                     header('Location: /dashboard');
                 } else {
+                    // Handle error
                 }
+
+            } else{
+                // Handle error
+            }
+
             }
         }
 

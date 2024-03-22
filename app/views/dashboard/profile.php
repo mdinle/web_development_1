@@ -10,7 +10,7 @@
         <?php include 'header.php';?>
         <?php include 'sidebar.php';?>
 
-        <div class="h-full ml-14 mt-14 mb-10 md:ml-64">
+        <div class="h-full ml-14 mt-14 mb-10 md:ml-64" x-data="{darkMode: false}"  :class="{ 'dark': darkMode }">
 
 
 
@@ -25,7 +25,7 @@
                         :class="{ 'text-gray-700 dark:text-white': !darkMode, 'text-gray-400 dark:text-gray-600': darkMode }"
                         class="block text-sm font-medium">Fullname</label>
                     <input type="text" id="fullname" name="fullname"
-                        class="mt-1 p-2 border border-gray-300 dark:border-gray-700 rounded-md w-full"
+                        class="mt-1 p-2 border border-gray-300 dark:border-white rounded-md w-full"
                         :class="{ 'text-gray-900 dark:text-white bg-white dark:bg-gray-700': !darkMode, 'text-gray-400 dark:text-gray-600 bg-gray-800': darkMode }">
                 </div>
                 <div class="mb-4">
@@ -33,7 +33,7 @@
                         :class="{ 'text-gray-700 dark:text-white': !darkMode, 'text-gray-400 dark:text-gray-600': darkMode }"
                         class="block text-sm font-medium">Age</label>
                     <input type="number" id="age" name="age"
-                        class="mt-1 p-2 border border-gray-300 dark:border-gray-700 rounded-md w-full"
+                        class="mt-1 p-2 border border-gray-300 dark:border-white rounded-md w-full"
                         :class="{ 'text-gray-900 dark:text-white bg-white dark:bg-gray-700': !darkMode, 'text-gray-400 dark:text-gray-600 bg-gray-800': darkMode }">
                 </div>
                 <div class="mb-4">
@@ -41,7 +41,7 @@
                         :class="{ 'text-gray-700 dark:text-white': !darkMode, 'text-gray-400 dark:text-gray-600': darkMode }"
                         class="block text-sm font-medium">Select your gender</label>
                     <select id="gender" name="gender"
-                        class="mt-1 p-2 border border-gray-300 dark:border-gray-700 rounded-md w-full"
+                        class="mt-1 p-2 border border-gray-300 dark:border-white rounded-md w-full"
                         :class="{ 'text-gray-900 dark:text-white bg-white dark:bg-gray-700': !darkMode, 'text-gray-400 dark:text-gray-600 bg-gray-800': darkMode }">
                         <option selected>Gender</option>
                         <option value="male">Male</option>
@@ -53,7 +53,7 @@
                         :class="{ 'text-gray-700 dark:text-white': !darkMode, 'text-gray-400 dark:text-gray-600': darkMode }"
                         class="block text-sm font-medium">Address</label>
                     <input type="text" id="address" name="address"
-                        class="mt-1 p-2 border border-gray-300 dark:border-gray-700 rounded-md w-full"
+                        class="mt-1 p-2 border border-gray-300 dark:border-white rounded-md w-full"
                         :class="{ 'text-gray-900 dark:text-white bg-white dark:bg-gray-700': !darkMode, 'text-gray-400 dark:text-gray-600 bg-gray-800': darkMode }">
                 </div>
                 <div class="mb-4">
@@ -61,7 +61,7 @@
                         :class="{ 'text-gray-700 dark:text-white': !darkMode, 'text-gray-400 dark:text-gray-600': darkMode }"
                         class="block text-sm font-medium">Phone Number</label>
                     <input type="number" id="phonenumber" name="phonenumber"
-                        class="mt-1 p-2 border border-gray-300 dark:border-gray-700 rounded-md w-full"
+                        class="mt-1 p-2 border border-gray-300 dark:border-white rounded-md w-full"
                         :class="{ 'text-gray-900 dark:text-white bg-white dark:bg-gray-700': !darkMode, 'text-gray-400 dark:text-gray-600 bg-gray-800': darkMode }">
                 </div>
                 <button type="submit"

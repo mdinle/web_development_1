@@ -99,9 +99,9 @@
 	function bookSession() {
 		const userId = <?php echo $clientId?> ;
 		var dateInput = document.getElementById('selectDate').value;
-		var trainer = document.getElementById('selectTrainer').value;
+		var trainer = +document.getElementById('selectTrainer').value;
 		var timeInput = document.getElementById('selectTime').value;
-		var duration = document.getElementById('selectDuration').value;
+		var duration = +document.getElementById('selectDuration').value;
 		var notes = document.getElementById('notes').value;
 
 
