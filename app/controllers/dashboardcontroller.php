@@ -134,7 +134,8 @@ class DashboardController
         if($_SERVER['REQUEST_METHOD'] == "POST") {
 
             if(isset($_POST['user'], $_POST['fullname'], $_POST['age'], $_POST['gender'], $_POST['address'], $_POST['phonenumber'])){
-                $useriD = filter_var($_POST['user'], FILTER_SANITIZE_NUMBER_INT);
+                try{
+                    $useriD = filter_var($_POST['user'], FILTER_SANITIZE_NUMBER_INT);
                 $fullName = htmlspecialchars($_POST['fullname']);
                 $age = filter_var($_POST['age'], FILTER_SANITIZE_NUMBER_INT);
                 $gender = htmlspecialchars($POST_['gender']);
@@ -159,13 +160,21 @@ class DashboardController
                     $_SESSION['userDetails'] = $userDetails;
 
                     header('Location: /dashboard');
+                    exit();
                 } else {
-                    // Handle error
+                    throw new Exception("Failed to create user details.");
                 }
 
             } else{
-                // Handle error
+                throw new Exception("Account type is not valid. Please contact a admin.");
             }
+
+                }
+                catch(Exception $e){
+                    echo $e->getMessage();
+                    echo "An error occurred. Please try again.";
+                    exit;
+                }
 
             }
         }
