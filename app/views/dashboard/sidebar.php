@@ -22,7 +22,7 @@
                     <span class="ml-2 text-sm tracking-wide truncate">Dashboard</span>
                 </a>
             </li>
-            <li class="<?php if($userType === 'trainer') {
+            <li class="<?php if($loggedInUserType === 'trainer') {
                 echo "hidden";
             };?>">
                 <a href="/dashboard/booking"
@@ -38,7 +38,7 @@
                     <span class="ml-2 text-sm tracking-wide truncate">Book a session</span>
                 </a>
             </li>
-            <li class="<?php if($userType === 'client') {
+            <li class="<?php if($loggedInUserType === 'client') {
                 echo "hidden";
             };?>">
                 <a href="/dashboard/admin"

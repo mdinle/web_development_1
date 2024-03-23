@@ -10,12 +10,18 @@ class DashboardController
     private $userService;
     private $bookingService;
     private $missingProfileInfo;
+    private $loggedInUserName;
+    private $loggedInUserType;
 
 
     public function __construct()
     {
         $this->userService = new UserService();
         $this->bookingService = new BookingService();
+        $userName = $_SESSION['user']->getUsername();
+        $userType = $_SESSION['user']->getUserType();
+        $this->loggedInUserName = $userName;
+        $this->loggedInUserType = $userType;
     }
 
     public function index()
@@ -29,8 +35,9 @@ class DashboardController
             $this->checkIfUserInfoIsMissing();
 
             $appointments = $this->bookingService->getBookingsByClient($_SESSION['userDetails']->getId());
-            $userName = $_SESSION['user']->getUsername();
-            $userType = $_SESSION['user']->getUserType();
+            $loggedInUserName = $this->loggedInUserName;
+            $loggedInUserType = $this->loggedInUserType;
+
             include '../views/dashboard/index.php';
         }
     }
@@ -48,8 +55,9 @@ class DashboardController
 
             $trainers = $this->bookingService->getAllTrainers();
             $clientId = $_SESSION['userDetails']->getId();
-            $userName = $_SESSION['user']->getUsername();
-            $userType = $_SESSION['user']->getUserType();
+            $loggedInUserName = $this->loggedInUserName;
+            $loggedInUserType = $this->loggedInUserType;
+
             include '../views/dashboard/booking.php';
         }
     }
@@ -62,45 +70,36 @@ class DashboardController
                 $formIdentifier = $_POST['form_identifier'];
                 switch ($formIdentifier) {
                     case 'addUserForm':
-                        $user = new User();
-                        $user->setUsername($_POST['username']);
-                        $user->setEmail($_POST['email']);
-                        $user->setPassword(password_hash($_POST['password'], PASSWORD_DEFAULT));
-                        $user->setUserType($_POST['userType']);
-                        $this->userService->createUser($user);
+                        $userName = $_POST['username'];
+                        $email = $_POST['email'];
+                        $password = $_POST['password'];
+                        $userType = $_POST['userType'];
+
+                        $this->userService->createUser(sanitizeUser(null, $userName, $email, $password, $userType));
 
                         header('Location: /dashboard/admin');
                         break;
                     case 'editUserForm':
-                        $user = new User();
-                        
-                        $user->setUserID($_POST['userId']);
+                        $userId = $_POST['userId'];
+                        $userName = $_POST['username'];
+                        $email = $_POST['email'];
+                        $password = $_POST['password'];
+                        $userType = $_POST['userType'];
 
-                        if($_POST['username'] != '') {
-                            $user->setUsername($_POST['username']);
-                        }
-                        if($_POST['email'] != '') {
-                            $user->setEmail($_POST['email']);
-                        }
-                        if($_POST['password'] != '') {
-                            $user->setPassword(password_hash($_POST['password'], PASSWORD_DEFAULT));
-                        }
-                        if($_POST['userType'] != 'User Type') {
-                            $user->setUserType($_POST['userType']);
-                        }
-
-                        if($user->getUsername() == null && $user->getEmail() == null && $_POST['password'] == null && $user->getUserType() == null) {
-                            header('Location: /dashboard/admin');
-                            exit();
-                        }
-
-                        $this->userService->updateUser($user);
+                        $this->userService->updateUser(sanitizeUser($userId, $userName, $email, $password, $userType));
 
                         header('Location: /dashboard/admin');
-
                         break;
                     case 'deleteUserForm':
-                        $this->userService->deleteUser($_POST['userId']);
+                        if(isset($_POST['userId'])) {
+                            $userId = filter_var($_POST['userId'], FILTER_SANITIZE_NUMBER_INT);
+                            $this->userService->deleteUser($userId);
+                            
+                        } else {
+                            throw new Exception("User ID is missing.");
+                            exit;
+                        }
+                        
 
                         header('Location: /dashboard/admin');
                         break;
@@ -122,9 +121,8 @@ class DashboardController
             $this->checkIfUserInfoIsMissing();
             
             $users = $this->userService->getAllUsers();
-            $userName = $_SESSION['user']->getUsername();
-            $userType = $_SESSION['user']->getUserType();
-
+            $loggedInUserName = $this->loggedInUserName;
+            $loggedInUserType = $this->loggedInUserType;
             include '../views/dashboard/admin.php';
         }
     }
@@ -133,49 +131,47 @@ class DashboardController
     {
         if($_SERVER['REQUEST_METHOD'] == "POST") {
 
-            if(isset($_POST['user'], $_POST['fullname'], $_POST['age'], $_POST['gender'], $_POST['address'], $_POST['phonenumber'])){
-                try{
+            if(isset($_POST['user'], $_POST['fullname'], $_POST['age'], $_POST['gender'], $_POST['address'], $_POST['phonenumber'])) {
+                try {
                     $useriD = filter_var($_POST['user'], FILTER_SANITIZE_NUMBER_INT);
-                $fullName = htmlspecialchars($_POST['fullname']);
-                $age = filter_var($_POST['age'], FILTER_SANITIZE_NUMBER_INT);
-                $gender = htmlspecialchars($POST_['gender']);
-                $address = htmlspecialchars($_POST['address']);
-                $phoneNumber = filter_var($_POST['phonenumber'], FILTER_SANITIZE_NUMBER_INT);
+                    $fullName = htmlspecialchars($_POST['fullname']);
+                    $age = filter_var($_POST['age'], FILTER_SANITIZE_NUMBER_INT);
+                    $gender = htmlspecialchars($POST_['gender']);
+                    $address = htmlspecialchars($_POST['address']);
+                    $phoneNumber = filter_var($_POST['phonenumber'], FILTER_SANITIZE_NUMBER_INT);
 
-                $userDetails = new Details();
+                    $userDetails = new Details();
 
-            $userDetails->setId($_SESSION['user']->getUserID());
-            $userDetails->setFullName($_POST['fullname']);
-            $userDetails->setAge($_POST['age']);
-            $userDetails->setGender($_POST['gender']);
-            $userDetails->setAddress($_POST['address']);
-            $userDetails->setPhonenumber($_POST['phonenumber']);
+                    $userDetails->setUserId($useriD);
+                    $userDetails->setFullName($fullName);
+                    $userDetails->setAge($age);
+                    $userDetails->setGender($gender);
+                    $userDetails->setAddress($address);
+                    $userDetails->setPhoneNumber($phoneNumber);
 
-            if($_SESSION['user']->getUserType() !== null) {
-                $result = $this->userService->createUserDetails($userDetails, $_SESSION['user']->getUserType());
+                    if($useriD !== null) {
+                        $result = $this->userService->createUserDetails($userDetails, $_SESSION['user']->getUserType());
 
-                if($result) {
-                    $userDetails->setId($result);
+                        if($result) {
+                            $userDetails->setId($result);
 
-                    $_SESSION['userDetails'] = $userDetails;
+                            $_SESSION['userDetails'] = $userDetails;
 
-                    header('Location: /dashboard');
-                    exit();
-                } else {
-                    throw new Exception("Failed to create user details.");
-                }
+                            header('Location: /dashboard');
+                            exit;
+                        } else {
+                            throw new Exception("Failed to create user details.");
+                        }
 
-            } else{
-                throw new Exception("Account type is not valid. Please contact a admin.");
-            }
+                    } else {
+                        throw new Exception("Account type is not valid. Please contact a admin.");
+                    }
 
-                }
-                catch(Exception $e){
+                } catch(Exception $e) {
                     echo $e->getMessage();
                     echo "An error occurred. Please try again.";
                     exit;
                 }
-
             }
         }
 
@@ -191,9 +187,10 @@ class DashboardController
                 $fillOutProfile = false;
             }
 
-            $userName = $_SESSION['user']->getUsername();
-            $userType = $_SESSION['user']->getUserType();
+
             $userId = $_SESSION['user']->getUserID();
+            $loggedInUserName = $this->loggedInUserName;
+            $loggedInUserType = $this->loggedInUserType;
             include '../views/dashboard/profile.php';
         }
     }
@@ -203,6 +200,37 @@ class DashboardController
         if(!$_SESSION['userDetails']->getId()) {
             header('Location: /dashboard/profile');
             exit();
+        }
+    }
+
+    public function sanitizeUser($userId, $userName, $email, $password, $userType)
+    {
+        $user = new User();
+                        
+        if(isset($userId)) {
+            $sanitizedUserId = filter_var($userId, FILTER_SANITIZE_NUMBER_INT);
+            
+            if(isset($userName)) {
+                $sanitizedUserName = htmlspecialchars($userName);
+                $user->setUsername($sanitizedUserName);
+            }
+
+            if(isset($email)) {
+                $sanitizedEmail = filter_var($email, FILTER_SANITIZE_EMAIL);
+                $user->setEmail($sanitizedEmail);
+            }
+
+            if(isset($password)) {
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $user->setPassword($hashedPassword);
+            }
+
+            if(isset($userType)) {
+                $sanitizedUserType = htmlspecialchars($userType);
+                $user->setUserType($sanitizedUserType);
+            }
+
+            return $user;
         }
     }
 }
