@@ -87,6 +87,34 @@ class BookingRepository extends Repository
         return $bookings;
     }
 
+    public function getBookingsByTrainer($trainer_id)
+    {
+        $stmt = $this->db->prepare("SELECT AppointmentID, Appointments.ClientID, Appointments.TrainerID, ClientDetails.FullName AS Client, AppointmentDateTime, Duration, Status
+        FROM `Appointments` 
+        JOIN ClientDetails ON Appointments.ClientID = ClientDetails.ClientID
+        where TrainerID = :trainerId;");
+        $stmt->execute([':trainerId' => $trainer_id]);
+
+        $bookingData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $bookings = [];
+
+        foreach ($bookingData as $data) {
+            $booking = new Appointment();
+            $booking->setAppointmentID($data['AppointmentID']);
+            $booking->setClientID($data['ClientID']);
+            $booking->setTrainerID($data['TrainerID']);
+            $booking->setClientName($data['Client']);
+            $booking->setDate($data['AppointmentDateTime']);
+            $booking->setDuration($data['Duration']);
+            $booking->setStatus($data['Status']);
+
+            $bookings[] = $booking;
+        }
+
+        return $bookings;
+    }
+
     public function checkAvailibilty($booking)
     {
         $start_time = $booking->getDate();

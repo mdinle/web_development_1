@@ -9,6 +9,7 @@ class Appointment
     private $clientID;
     private $trainerID;
     private $trainerName;
+    private $clientName;
     private $date;
     private $duration;
     private $status;
@@ -96,5 +97,15 @@ class Appointment
     public function setNotes($notes)
     {
         $this->notes = $notes;
+    }
+
+    public function getClientName()
+    {
+        return $this->clientName;
+    }
+    
+    public function setClientName($clientName)
+    {
+        $this->clientName = $clientName;
     }
 }

@@ -34,10 +34,16 @@ class DashboardController
 
             $this->checkIfUserInfoIsMissing();
 
-            $appointments = $this->bookingService->getBookingsByClient($_SESSION['userDetails']->getId());
-            $loggedInUserName = $this->loggedInUserName;
-            $loggedInUserType = $this->loggedInUserType;
+            if($_SESSION['user']->getUserType() == 'trainer') {
+                $trainerAppointments = $this->bookingService->getBookingsByTrainer($_SESSION['userDetails']->getId());
+            }
 
+            if($_SESSION['user']->getUserType() == 'client') {
+                $appointments = $this->bookingService->getBookingsByClient($_SESSION['userDetails']->getId());
+            }
+            
+            $userName = $_SESSION['user']->getUsername();
+            $userType = $_SESSION['user']->getUserType();
             include '../views/dashboard/index.php';
         }
     }

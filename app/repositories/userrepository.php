@@ -51,7 +51,6 @@ class UserRepository extends Repository
         }
     }
 
-
     public function getUserByEmail($email)
     {
         $stmt = $this->db->prepare("SELECT * FROM Users WHERE Email = :email LIMIT 1");
@@ -119,7 +118,7 @@ class UserRepository extends Repository
 
                 if($role === 'trainer') {
                     $userDetails->setId($userProfile['TrainerID']);
-                    $userDetails->setFirstName($userProfile['FullName']);
+                    $userDetails->setFullName($userProfile['FullName']);
                     $userDetails->setAge($userProfile['Age']);
                     $userDetails->setGender($userProfile['Gender']);
                     $userDetails->setAddress($userProfile['Address']);

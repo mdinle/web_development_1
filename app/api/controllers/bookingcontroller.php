@@ -39,16 +39,16 @@ class BookingController
                 $appointment->setNotes($notes);
 
                 try {
-                if($this->bookingService->checkAvailibilty($appointment)) {
-                    http_response_code(200);
-                    echo json_encode(['message' => 'Booking created']);
-                }
+                    if($this->bookingService->checkAvailibilty($appointment)) {
+                        http_response_code(200);
+                        echo json_encode(['message' => 'Booking created']);
+                    }
                 } catch(Exception $e) {
-                http_response_code(500);
-                echo json_encode(['message' => $e->getMessage()]);
-                return;
+                    http_response_code(500);
+                    echo json_encode(['message' => $e->getMessage()]);
+                    return;
                 }
-            }else{
+            } else {
                 http_response_code(400);
                 echo json_encode(['message' => 'Missing required fields']);
                 return;
@@ -71,9 +71,9 @@ class BookingController
             $json = file_get_contents('php://input');
             $data = json_decode($json, true);
 
-            if(isset($data['appointmentId'])){
+            if(isset($data['appointmentId'])) {
                 $booking_id = filter_var($data['appointmentId'], FILTER_SANITIZE_NUMBER_INT);
-            }else {
+            } else {
                 http_response_code(400);
                 echo json_encode(['message' => 'Missing appointmentId']);
                 return;
@@ -83,6 +83,37 @@ class BookingController
                 if($this->bookingService->deleteBooking($booking_id)) {
                     http_response_code(200);
                     echo json_encode(['message' => 'Booking deleted']);
+                }
+            } catch(Exception $e) {
+                http_response_code(500);
+                echo json_encode(['message' => $e->getMessage()]);
+                return;
+            }
+        }
+    }
+
+    public function approve()
+    {
+        if (!isset($_SESSION['user'])) {
+            http_response_code(401);
+            echo json_encode(['message' => 'Unauthorized']);
+            return;
+        }
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            if(!isset($data)) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Missing appointmentId']);
+                return;
+            }
+
+            try {
+                if($this->bookingService->approveBooking($data)) {
+                    http_response_code(200);
+                    echo json_encode(['message' => 'Booking approved']);
                 }
             } catch(Exception $e) {
                 http_response_code(500);
