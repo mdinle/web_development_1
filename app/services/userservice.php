@@ -22,12 +22,21 @@ class UserService
         return $this->userRepo->insertUserDetails($userDetails, $userType);
     }
 
+    public function updateUserDetails($userDetails, $userType)
+    {
+        if($userType === 'client') {
+            return $this->userRepo->updateClientDetails($userDetails);
+        } elseif ($userType === 'trainer') {
+            return $this->userRepo->updateTrainerDetails($userDetails);
+        }
+    }
+
     public function authenticateUser($user)
     {
         $userData = $this->userRepo->getUserByEmail($user->getEmail());
 
         if ($userData) {
-            if (!password_verify($user->getPassword(), $userData['user']->getPassword())) {
+            if (!password_verify($user->getPassword(), $userData->getPassword())) {
                 return false;
             }
             return $userData;
@@ -36,9 +45,15 @@ class UserService
         }
     }
 
+    public function getUserDetails($user_id, $userType)
+    {
+        return $this->userRepo->getUserDetails($user_id, $userType);
+    }
+
     public function changePassword($password, $user_id)
     {
-        return $this->userRepo->changePassword($password, $user_id);
+        $password_hashed = password_hash($password, PASSWORD_DEFAULT);
+        return $this->userRepo->changePassword($password_hashed, $user_id);
     }
 
     public function getAllUsers()

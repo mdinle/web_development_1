@@ -17,13 +17,19 @@ class UserRepository extends Repository
             ':password_hash' => $user->getPassword(),
             ':user_type' => $user->getUserType()]);
 
-        return $results;
+        if($results) {
+
+            $newUserID = $this->db->lastInsertId();
+    
+            return $newUserID;
+        } else {
+            return false;
+        }
 
     }
 
     public function insertUserDetails($userDetails, $userType)
     {
-        $query = '';
         if($userType === 'client') {
             $query = "INSERT INTO ClientDetails (UserID, FullName, Age, Gender, Address, PhoneNumber) 
             VALUES (:userID, :fullname, :age, :gender, :address, :phonenumber)";
@@ -43,12 +49,80 @@ class UserRepository extends Repository
             ':phonenumber' => $userDetails->getPhonenumber()]);
 
         if($results) {
-            $newUserID = $this->db->lastInsertId();
+            $newID = $this->db->lastInsertId();
 
-            return $newUserID;
+            return $newID;
         } else {
             return false;
         }
+    }
+
+    public function updateClientDetails($clientDetails)
+    {
+        $sql = "UPDATE ClientDetails SET ";
+        $updates = [];
+
+        if ($clientDetails->getFullName() !== null) {
+            $updates[] = "FullName = '" . $clientDetails->getFullName() . "'";
+        }
+        if ($clientDetails->getAge() !== null) {
+            $updates[] = "Age = '" . $clientDetails->getAge() . "'";
+        }
+        if ($clientDetails->getGender() !== null) {
+            $updates[] = "Gender = '" . $clientDetails->getGender() . "'";
+        }
+        if ($clientDetails->getAddress() !== null) {
+            $updates[] = "Address = '" . $clientDetails->getAdress() . "'";
+        }
+        if ($clientDetails->getPhonenumber() !== null) {
+            $updates[] = "PhoneNumber = '" . $clientDetails->getPhonenumber() . "'";
+        }
+
+        $sql .= implode(", ", $updates);
+        $sql .= " WHERE UserID = :userID";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':userID', $userId);
+        $userId = $clientDetails->getId();
+
+
+        $results = $stmt->execute();
+
+        return $results;
+    }
+
+    public function updateTrainerDetails($trainerDetails)
+    {
+        $sql = "UPDATE TrainerDetails SET ";
+        $updates = [];
+
+        if ($trainerDetails->getFullName() !== null) {
+            $updates[] = "FullName = '" . $trainerDetails->getFullName() . "'";
+        }
+        if ($trainerDetails->getAge() !== null) {
+            $updates[] = "Age = '" . $trainerDetails->getAge() . "'";
+        }
+        if ($trainerDetails->getGender() !== null) {
+            $updates[] = "Gender = '" . $trainerDetails->getGender() . "'";
+        }
+        if ($trainerDetails->getAddress() !== null) {
+            $updates[] = "Address = '" . $trainerDetails->getAdress() . "'";
+        }
+        if ($trainerDetails->getPhonenumber() !== null) {
+            $updates[] = "PhoneNumber = '" . $trainerDetails->getPhonenumber() . "'";
+        }
+
+        $sql .= implode(", ", $updates);
+        $sql .= " WHERE UserID = :userID";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':userID', $userId);
+        $userId = $trainerDetails->getId();
+
+
+        $results = $stmt->execute();
+
+        return $results;
     }
 
     public function getUserByEmail($email)
@@ -59,94 +133,66 @@ class UserRepository extends Repository
         
         $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($userData) {
-            $userId = $userData['UserID'];
-            $role = $userData['UserType'];
-
-            $additionalDetailsQuery = '';
-            if ($role === 'client') {
-                $additionalDetailsQuery = "SELECT * FROM ClientDetails WHERE UserID = :userId";
-            } elseif ($role === 'trainer') {
-                $additionalDetailsQuery = "SELECT * FROM TrainerDetails WHERE UserID = :userId";
-            }
-
-            if ($additionalDetailsQuery) {
-                $stmt = $this->db->prepare($additionalDetailsQuery);
-                $stmt->execute(['userId' => $userId]);
-                $additionalDetails = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                if(!$additionalDetails) {
-                    $user = new User();
-                    $user->setUserID($userData['UserID']);
-                    $user->setUsername($userData['Username']);
-                    $user->setEmail($userData['Email']);
-                    $user->setPassword($userData['Password']);
-                    $user->setUserType($userData['UserType']);
-                    $user->setRegistrationDate($userData['RegistrationDate']);
-                    $user->setLastLoginDate($userData['LastLoginDate']);
-
-                    $emptyDetails = new Details();
-
-                    $completeProfile = [
-                        'user' => $user,
-                        'details' => $emptyDetails
-                    ];
-
-                    return $completeProfile;
-                }
-        
-                $userProfile = array_merge($userData, $additionalDetails);
-
-                $user = new User();
-                $user->setUserID($userProfile['UserID']);
-                $user->setUsername($userProfile['Username']);
-                $user->setEmail($userProfile['Email']);
-                $user->setPassword($userProfile['Password']);
-                $user->setUserType($userProfile['UserType']);
-                $user->setRegistrationDate($userProfile['RegistrationDate']);
-                $user->setLastLoginDate($userProfile['LastLoginDate']);
-                
-                $userDetails = new Details();
-                if($role === 'client') {
-                    $userDetails->setId($userProfile['ClientID']);
-                    $userDetails->setFullName($userProfile['FullName']);
-                    $userDetails->setAge($userProfile['Age']);
-                    $userDetails->setGender($userProfile['Gender']);
-                    $userDetails->setAddress($userProfile['Address']);
-                    $userDetails->setPhonenumber($userProfile['PhoneNumber']);
-                }
-
-                if($role === 'trainer') {
-                    $userDetails->setId($userProfile['TrainerID']);
-                    $userDetails->setFullName($userProfile['FullName']);
-                    $userDetails->setAge($userProfile['Age']);
-                    $userDetails->setGender($userProfile['Gender']);
-                    $userDetails->setAddress($userProfile['Address']);
-                    $userDetails->setPhonenumber($userProfile['PhoneNumber']);
-                }
-
-                $completeProfile = [
-                    'user' => $user,
-                    'details' => $userDetails
-                ];
-
-                return $completeProfile;
-            } else {
-                return false;
-            }
+        if ($userData) {
+            $user = new User();
+            $user->setUserID($userData['UserID']);
+            $user->setUsername($userData['Username']);
+            $user->setEmail($userData['Email']);
+            $user->setPassword($userData['Password']);
+            $user->setUserType($userData['UserType']);
+            $user->setRegistrationDate($userData['RegistrationDate']);
+            $user->setLastLoginDate($userData['LastLoginDate']);
+            return $user;
         } else {
-            return false;
+            return null;
+        }
+    }
+
+    public function getUserDetails($user_id, $userType)
+    {
+        if($userType === 'client') {
+            $sql = "SELECT * FROM ClientDetails WHERE UserID = :user_id";
+        } elseif ($userType === 'trainer') {
+            $sql = "SELECT * FROM TrainerDetails WHERE UserID = :user_id";
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':user_id' => $user_id]);
+        $userDetailsData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+        if ($userDetailsData) {
+            if ($userType === 'client') {
+                $userDetails = new Details();
+                $userDetails->setId($userDetailsData['ClientID']);
+                $userDetails->setFullName($userDetailsData['FullName']);
+                $userDetails->setAge($userDetailsData['Age']);
+                $userDetails->setGender($userDetailsData['Gender']);
+                $userDetails->setAddress($userDetailsData['Address']);
+                $userDetails->setPhonenumber($userDetailsData['PhoneNumber']);
+            } elseif ($userType === 'trainer') {
+                $userDetails = new Details();
+                $userDetails->setId($userDetailsData['TrainerID']);
+                $userDetails->setFullName($userDetailsData['FullName']);
+                $userDetails->setAge($userDetailsData['Age']);
+                $userDetails->setGender($userDetailsData['Gender']);
+                $userDetails->setAddress($userDetailsData['Address']);
+                $userDetails->setPhonenumber($userDetailsData['PhoneNumber']);
+            }
+            return $userDetails;
+        } else {
+            return null;
         }
     }
 
     public function changePassword($password, $user_id)
     {
 
-        $stmt = $this->db->prepare("UPDATE users SET password_hash = :password_hash WHERE id = :user_id;");
+        $stmt = $this->db->prepare("UPDATE Users SET Password = :password WHERE UserID = :userId;");
 
         $results = $stmt->execute([
-            ':password_hash' => $password,
-            ':user_id' => $user_id,]);
+            ':password' => $password,
+            ':userId' => $user_id,]);
 
         return $results;
 

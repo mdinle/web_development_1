@@ -8,11 +8,12 @@ include __DIR__ . '/../header.php';
 	<div class="absolute top-1/2 text-center left-1/2 transform -translate-x-1/2">
 		<div class="bg-black bg-opacity-40 p-4 rounded-lg space-y-4">
 
-			<p class=" text-white font-bold md:text-2xl">Get Shredded for the Summer!</p>
+			<p class=" text-white font-bold md:text-2xl mb-5 ">Get Shredded for the Summer!</p>
 
-			<button onclick="redirectToBookingPage()" class="bg-black p-2 rounded-xl text-white hover:opacity-60">
-				<p class=" text-white text-xs md:text-sm">Book a Session</p>
-			</button>
+			<a href="/dashboard/booking">
+				<button class="bg-black p-2 rounded-xl text-white hover:opacity-60">
+					<p class=" text-white text-xs md:text-sm">Book a Session</p>
+				</button></a>
 		</div>
 	</div>
 </section>

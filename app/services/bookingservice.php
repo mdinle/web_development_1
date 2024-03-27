@@ -47,4 +47,14 @@ class BookingService
     {
         return $this->bookingRepo->canCancelAppointment($appointmentId);
     }
+
+    public function approveBooking($appointmentId)
+    {
+        return $this->bookingRepo->approveBooking($appointmentId);
+    }
+
+    public function cancelAppointment($appointmentId)
+    {
+        return $this->bookingRepo->cancelAppointment($appointmentId);
+    }
 }

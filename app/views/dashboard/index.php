@@ -1,4 +1,6 @@
 <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.8.0/dist/alpine.min.js" defer></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 	<link rel="stylesheet" href="/css/style.css">
@@ -75,6 +77,9 @@
 							<th scope="col" class="px-6 py-3">
 
 							</th>
+							<th scope="col" class="px-6 py-3">
+
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -87,7 +92,8 @@
 						    echo '<td class="px-6 py-4">' . $trainerAppointment->getDuration() . '</td>';
 						    echo '<td class="px-6 py-4">' . $trainerAppointment->getStatus() . '</td>';
 						    echo '<td class="px-6 py-4">' . $trainerAppointment->getClientName() . '</td>';
-						    echo '<td class="px-6 py-4"><button class="text-red-500 underline underline-offset-1" onclick="approve_session(' . $appointment->getAppointmentID() . ')">Approve</button></td>';
+						    echo '<td class="px-6 py-4"><button class="text-green-500 underline underline-offset-1" onclick="approve_session(' . $trainerAppointment->getAppointmentID() . ')">Approve</button></td>';
+						    echo '<td class="px-6 py-4"><button class="text-red-500 underline underline-offset-1" onclick="cancel_session(' . $trainerAppointment->getAppointmentID() . ')">Cancel</button></td>';
 						    echo '</tr>';
 						}?>
 					</tbody>
@@ -137,6 +143,37 @@
 		if (confirm('Are you sure you want to approve this session?')) {
 
 			fetch('/api/booking/approve', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(id),
+				})
+				.then(response => {
+					if (!response.ok) {
+						// If the response is not OK, handle the error
+						return response.json().then(error => {
+							throw new Error(error
+								.message); // Throw an error with the message received from the server
+						});
+					}
+					return response.json(); // If response is OK, return JSON data
+				})
+				.then(data => {
+					alert(data.message);
+					location.reload();
+				})
+				.catch((error) => {
+					console.error('Error:', error);
+					alert('Error booking session: ' + error.message); // Display the error message in the alert box
+				});
+		}
+	}
+
+	function cancel_session(id) {
+		if (confirm('Are you sure you want to cancel this session?')) {
+
+			fetch('/api/booking/cancelAppointment', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

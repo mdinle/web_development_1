@@ -159,4 +159,28 @@ class BookingRepository extends Repository
             throw new Exception("Cannot cancel appointment. Trainer has already accepted session.");
         }
     }
+
+    public function approveBooking($appointmentID)
+    {
+        $stmt = $this->db->prepare("UPDATE Appointments SET Status = 'confirmed' WHERE AppointmentID = :appointmentID");
+        $results = $stmt->execute([':appointmentID' => $appointmentID]);
+
+        if (!$results) {
+            throw new Exception("Failed to approve booking.");
+        } else {
+            return $results;
+        }
+    }
+
+    public function cancelAppointment($appointmentID)
+    {
+        $stmt = $this->db->prepare("UPDATE Appointments SET Status = 'cancelled' WHERE AppointmentID = :appointmentID");
+        $results = $stmt->execute([':appointmentID' => $appointmentID]);
+
+        if (!$results) {
+            throw new Exception("Failed to cancel appointment.");
+        } else {
+            return $results;
+        }
+    }
 }

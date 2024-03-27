@@ -102,7 +102,6 @@ class BookingController
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $json = file_get_contents('php://input');
-            ;
             $data = json_decode($json, true);
 
             if(!isset($data)) {
@@ -115,6 +114,37 @@ class BookingController
                 if($this->bookingService->approveBooking($data)) {
                     http_response_code(200);
                     echo json_encode(['message' => 'Booking approved']);
+                }
+            } catch(Exception $e) {
+                http_response_code(500);
+                echo json_encode(['message' => $e->getMessage()]);
+                return;
+            }
+        }
+    }
+
+    public function cancelAppointment()
+    {
+        if (!isset($_SESSION['user'])) {
+            http_response_code(401);
+            echo json_encode(['message' => 'Unauthorized']);
+            return;
+        }
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $json = file_get_contents('php://input');
+            $data = json_decode($json, true);
+
+            if(!isset($data)) {
+                http_response_code(400);
+                echo json_encode(['message' => 'Missing appointmentId']);
+                return;
+            }
+
+            try {
+                if($this->bookingService->cancelAppointment($data)) {
+                    http_response_code(200);
+                    echo json_encode(['message' => 'Booking cancelled']);
                 }
             } catch(Exception $e) {
                 http_response_code(500);

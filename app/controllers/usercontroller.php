@@ -1,5 +1,6 @@
 <?php
 use \App\Models\User;
+use \App\Models\Details;
 use \App\Services\UserService;
 
 class UserController
@@ -21,15 +22,29 @@ class UserController
         if($_SERVER['REQUEST_METHOD'] == "POST") {
             
             $user = new User();
+            $userDetails = new Details();
 
             $hashedPassword = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
+            
+            $userDetails->setFullName($_POST['fullname']);
+            $userDetails->setAge($_POST['age']);
+            $userDetails->setGender($_POST['gender']);
+            $userDetails->setAddress($_POST['address']);
+            $userDetails->setPhonenumber($_POST['phonenumber']);
             $user->setUsername($_POST['username']);
             $user->setEmail($_POST['email']);
             $user->setPassword($hashedPassword);
             $user->setUserType('client');
 
-            $this->UserService->createUser($user);
+            $newUserID = $this->UserService->createUser($user);
+            if($newUserID) {
+                $userDetails->setId($newUserID);
+                $newUserID = $this->UserService->createUserDetails($userDetails, $user->getUserType());
+                if($newUserID) {
+                    header('Location: /user/login');
+                }
+            }
                 
             header('Location: /user/login');
         }
@@ -52,14 +67,10 @@ class UserController
             $authenticateUser = $this->UserService->authenticateUser($user);
 
             if($authenticateUser) {
-                $_SESSION['user'] = $authenticateUser['user'];
-                $_SESSION['userDetails'] = $authenticateUser['details'];
+                $_SESSION['user'] = $authenticateUser;
+                $_SESSION['userDetails'] = $this->UserService->getUserDetails($authenticateUser->getUserID(), $authenticateUser->getUserType());
                     
-                if($_SESSION['userDetails']->getId()) {
-                    header('Location: /dashboard');
-                } else {
-                    header('Location: /dashboard/profile');
-                }
+                header('Location: /dashboard');
             } else {
                 $errorMessage = "Invalid email or password";
                 include '../views/user/login.php';

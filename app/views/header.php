@@ -29,7 +29,7 @@
 					<!-- Login Button -->
 					<button class="bg-black py-1 px-5 rounded-xl text-white hover:opacity-60"
 						onclick="redirectToLoginPage()">
-						Login
+						<?php echo isset($_SESSION['user']) ? 'Dashboard' : 'Login'; ?>
 					</button>
 				</div>
 			</div>
